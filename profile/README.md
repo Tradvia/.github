@@ -1,55 +1,41 @@
 <p align="center"><img src="https://raw.githubusercontent.com/tradvia/tradvia-web/main/logo.svg" width="96" alt="Tradvia"></p>
 
-# Tradvia — Multi-Agent Orchestration for Project Execution
+# Tradvia — Open-Core AgentOps & Hybrid Execution Control Plane
 
-> **An early-stage open-core platform where AI agents and people execute the same project, with progress visible as Kanban, Gantt, Burndown, WBS, calendar and capacity — natively or inside the tools teams already use.**
+> **Orchestrate humans, multi-model APIs and isolated container sessions in a single control plane.**
 > 🌐 [tradvia.org](https://tradvia.org) · 📫 Security & partnerships: `security@tradvia.org`
 
 > [!NOTE]
-> **Status: early stage, building in public.** Below, every capability is marked as **Shipped**, **In progress** or **Planned**, so you can see exactly what exists in code today.
+> **Status: early stage, building in public.** Every capability below is marked **Shipped**, **In progress**, **Partial** or **Planned**, so you can see exactly what exists in code today.
 
 ---
 
 ## 🚀 Why Tradvia?
 
-Projects slip less from a lack of skill than from **coordination friction**: status scattered across tools, decisions waiting in chat, and stakeholders who each need to see progress differently.
+Tradvia removes the coordination friction between project management and autonomous execution. Work is dispatched as cards on a hybrid Kanban, routed to multi-vendor LLM APIs or to stateful browser/CLI containers, tracked to the token and the compute second, and handed back and forth between AI agents and human engineers without losing context.
 
-Tradvia orchestrates AI agents and human members on one shared set of work items. Every action is transparent in the notation each audience needs — the team's Kanban, the project manager's Gantt, the Scrum Master's burndown, the sponsor's WBS — and when an agent hits a decision that belongs to a person, it stops and asks in the chat you already use.
+## 🧱 Architecture pillars
 
-## 📊 Progress views
-
-| Notation | Answers |
+| Pillar | Status |
 |---|---|
-| **Kanban** | Where is each item in the workflow right now? |
-| **Gantt** | How long does each item take, what depends on what, which milestone is at risk? |
-| **Scrum / Burndown** | Will the sprint scope be delivered in time? |
-| **WBS / EAP** | How does the scope break down into deliverables? |
-| **Calendar / Timeline** | What is due on which date? |
-| **Workload / Capacity** | Who — person or agent — is over- or under-allocated? |
+| **Dual-runtime execution** — stateless LLM APIs (OpenAI, Anthropic, Gemini, Ollama) plus stateful CLI/browser session workers (Playwright/CDP) with session mutex locks and persistent auth contexts | 🟦 Partial — APIs via LiteLLM ([PR #1](https://github.com/tradvia/tradvia/pull/1)) |
+| **Multi-account pool & Token FinOps** — load spread within each account's RPM/TPM quota, cross-vendor fallback, cost per token or compute second, budget circuit breakers | 🟦 Partial — cost recorded per card |
+| **Executable hybrid Kanban & Live Session Takeover** — every card is a durable state machine; humans take over a frozen browser/terminal (WebRTC/VNC), unblock it and hand control back | 🔨 In progress — state machine + approval in chat |
+| **Zero-trust sandbox** — ephemeral Firecracker MicroVMs, PostgreSQL Row-Level Security, encrypted credential and session vaults | 🗓️ Planned · v0.2+ |
+| **Native MCP & AST GraphRAG** — episodic knowledge distillation to cut token cost over time | 🗓️ Planned · v0.2+ |
+| **Open-core monorepo** — self-hosted `/core` (Docker Compose); `/ee` + Cloud with team session pools, RBAC and FinOps governance | 🔨 In progress — monorepo, licenses, CI |
 
-## 🧱 Architecture & status
+**Ground rules:** the account pool respects every vendor's rate limits and terms, and 2FA or CAPTCHA prompts are always resolved by a human through live takeover.
 
-| Capability | Status |
-|---|---|
-| **Work-item lifecycle** — 5 statuses (`BACKLOG`, `AGENT_WORKING`, `WAITING_HUMAN`, `IN_REVIEW_PR`, `DONE`) with enforced transitions | ✅ Shipped |
-| **Neutral work model + six views** — hierarchy, dates, dependencies, sprints, estimates; Kanban, Gantt, Burndown, WBS, calendar and capacity as tested projections | 🔨 In progress ([PR #2](https://github.com/tradvia/tradvia/pull/2)) |
-| **Human-in-the-loop orchestrator** — LangGraph flow that pauses (`interrupt`), asks in Discord and opens a pull request only after approval | 🔨 In progress ([PR #1](https://github.com/tradvia/tradvia/pull/1)) |
-| **Model routing** — LiteLLM in front of every model call, cost recorded on each work item | 🔨 In progress (PR #1) |
-| **Web views** — the six notations rendered in the browser | 🗓️ Planned · v0.2 |
-| **Connectors** — Trello, Jira, ClickUp, Monday.com, Asana, Wrike, Smartsheet, Artia, Microsoft Planner, KanbanFlow, Airtable (one shared interface) | 🗓️ Planned · v0.2+ |
-| **Native MCP servers** — GitHub, project tools and chat through Model Context Protocol | 🗓️ Planned · v0.2+ |
-| **Zero-trust multi-tenancy** — PostgreSQL Row-Level Security, Firecracker microVM per task | 🗓️ Planned · v0.2+ |
-| **Token FinOps ledger** — budgets and circuit breakers per work item and sprint | 🗓️ Planned · v0.2+ |
+## 🗺️ Roadmap
 
-## 🗺️ Roadmap (dogfooding: the machine building the machine)
-
-- [x] **Phase 0 — Foundation:** open-core repository (`core/` FSL, `ee/` commercial), CLA, governance, CI and the work-item lifecycle contract.
-- [ ] **Phase 1 — Engine v0.1:** LangGraph orchestrator, the neutral work model with its six views, LiteLLM routing, GitHub integration and human approval in chat. *(in progress)*
-- [ ] **Phase 2 — Web views and first connectors:** the six views in the browser plus Jira and Trello, built in public by v0.1 agents.
-- [ ] **Phase 3 — Enterprise:** SSO/RBAC, WhatsApp and Teams, portfolio and ROI dashboards, the remaining connectors.
+- [x] **Phase 0 — Foundation:** open-core monorepo (`core/` FSL, `ee/` commercial), CLA, CI and the card state-machine contract.
+- [ ] **Phase 1 — Engine v0.1:** LangGraph orchestrator, LiteLLM API runtime with cost per card, GitHub integration and approval gates in chat. *(in progress)*
+- [ ] **Phase 2 — Session workers & takeover:** browser/CLI workers in Firecracker MicroVMs, live takeover over WebRTC, multi-account pool with budget breakers, MCP, Docker Compose self-hosting.
+- [ ] **Phase 3 — Enterprise & Cloud:** team session pools, SSO/RBAC, WhatsApp and Teams, AST GraphRAG, FinOps governance and project-tool connectors.
 
 ## 🤝 Call for contributors
 
-We are looking for early contributors in **LangGraph, project-tool connectors, MCP servers, data visualization and AI security**. Connectors are a great first contribution: each one implements the same `TrackerConnector` interface. Start with [CONTRIBUTING.md](https://github.com/tradvia/tradvia/blob/main/CONTRIBUTING.md), or reach Founder & Chief Architect **Anderson dos Santos Dutra** at `security@tradvia.org`.
+We are looking for early contributors in **LangGraph, Playwright/CDP session workers, Firecracker, MCP servers, FinOps and AI security**. Start with [CONTRIBUTING.md](https://github.com/tradvia/tradvia/blob/main/CONTRIBUTING.md), or reach Founder & Chief Architect **Anderson dos Santos Dutra** at `security@tradvia.org`.
 
 <sub>Tradvia's core is fair source under FSL-1.1-ALv2 (each release becomes Apache 2.0 after two years).</sub>
